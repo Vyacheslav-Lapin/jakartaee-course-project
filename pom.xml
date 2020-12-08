@@ -1,14 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>ru.luxoft.training.jakartaee</groupId>
   <artifactId>jakartaee-course-project</artifactId>
   <version>${revision}</version>
+  <modules>
+    <module>web</module>
+  </modules>
 
-  <packaging>war</packaging>
+  <packaging>pom</packaging>
+
+  <!--<repositories>-->
+  <!--  <repository>-->
+  <!--    <id>JBoss Repository</id>-->
+  <!--    <url>https://repository.jboss.org/nexus/content/groups/public/</url>-->
+  <!--  </repository>-->
+  <!--</repositories>-->
 
   <properties>
 
@@ -22,24 +30,38 @@
 
     <!--region BOMs -->
     <spring-boot.version>2.4.0</spring-boot.version>
+    <wildfly-jakartaee8-with-tools.version>21.0.1.Final</wildfly-jakartaee8-with-tools.version>
+    <jboss-javaee-all-8.0.version>1.0.4.Final</jboss-javaee-all-8.0.version>
     <!--endregion-->
 
     <!--region Libs -->
     <tomcat.version>10.0.0-M10</tomcat.version>
     <javaee-api.version>8.0.1</javaee-api.version>
 
-    <checker.version>3.7.1</checker.version>
+    <checker.version>3.8.0</checker.version>
     <annotations.version>20.1.0</annotations.version>
     <jcip-annotations.version>1.0</jcip-annotations.version>
     <spotbugs.version>4.2.0</spotbugs.version>
     <error_prone_annotations.version>2.4.0</error_prone_annotations.version>
     <!--endregion-->
 
+    <!--region Test Libs-->
+    <version.arquillian>1.0.0.Alpha4</version.arquillian>
+    <version.glassfish>3.2-b06</version.glassfish>
+    <!--endregion-->
+
     <!--region Plugins-->
+    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <maven.compiler.parameters>true</maven.compiler.parameters>
+    <maven.compiler.forceJavacCompilerUse>true</maven.compiler.forceJavacCompilerUse>
+
     <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
-    <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.compiler.parameters>true</maven.compiler.parameters>
     <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
+    <wildfly-maven-plugin.version>2.1.0.Beta1</wildfly-maven-plugin.version>
+    <maven-ejb-plugin.version>3.1.0</maven-ejb-plugin.version>
     <!--endregion-->
 
   </properties>
@@ -48,6 +70,20 @@
     <dependencies>
 
       <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-jakartaee8-with-tools</artifactId>
+        <version>${wildfly-jakartaee8-with-tools.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.spec</groupId>
+        <artifactId>jboss-javaee-all-8.0</artifactId>
+        <version>${jboss-javaee-all-8.0.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
         <version>${spring-boot.version}</version>
@@ -55,23 +91,42 @@
         <scope>import</scope>
       </dependency>
 
-      <!--region Tomcat-->
-      <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>tomcat-catalina</artifactId>
-        <version>${tomcat.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>tomcat-jasper</artifactId>
-        <version>${tomcat.version}</version>
-        <scope>provided</scope>
-      </dependency>
       <dependency>
         <groupId>javax</groupId>
         <artifactId>javaee-api</artifactId>
         <version>${javaee-api.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!--region Common Annotations (CheckerFramework, JetBrains, SpotBugs, ErrorProne) -->
+      <dependency>
+        <groupId>org.checkerframework</groupId>
+        <artifactId>checker</artifactId>
+        <version>${checker.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>${annotations.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.jcip</groupId>
+        <artifactId>jcip-annotations</artifactId>
+        <version>${jcip-annotations.version}</version>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-annotations</artifactId>
+        <version>${spotbugs.version}</version>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>com.google.errorprone</groupId>
+        <artifactId>error_prone_annotations</artifactId>
+        <version>${error_prone_annotations.version}</version>
         <scope>provided</scope>
       </dependency>
       <!--endregion-->
@@ -80,6 +135,12 @@
   </dependencyManagement>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.jboss.spec.javax.servlet</groupId>
+      <artifactId>jboss-servlet-api_4.0_spec</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -92,54 +153,57 @@
     <dependency>
       <groupId>org.checkerframework</groupId>
       <artifactId>checker</artifactId>
-      <version>${checker.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
-      <version>${annotations.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>net.jcip</groupId>
       <artifactId>jcip-annotations</artifactId>
-      <version>${jcip-annotations.version}</version>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
-      <version>${spotbugs.version}</version>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.google.errorprone</groupId>
       <artifactId>error_prone_annotations</artifactId>
-      <version>${error_prone_annotations.version}</version>
-      <scope>provided</scope>
     </dependency>
     <!--endregion-->
 
-    <!--region Tomcat-->
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-catalina</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper</artifactId>
-    </dependency>
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-api</artifactId>
     </dependency>
-    <!--endregion-->
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
+
+    <!--region Test dependencies - JUnit Jupiter, AssertJ, Hamcrest, Mockito -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!--endregion-->
 
   </dependencies>
 
@@ -149,6 +213,16 @@
 
     <pluginManagement>
       <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <compilerArgs>
+              <arg>-parameters</arg>
+              <!--<arg>-Xlint:preview</arg>-->
+            </compilerArgs>
+          </configuration>
+        </plugin>
 
         <plugin>
           <artifactId>maven-enforcer-plugin</artifactId>
@@ -175,16 +249,31 @@
           <version>${versions-maven-plugin.version}</version>
           <configuration>
             <generateBackupPoms>false</generateBackupPoms>
-            <!--suppress MybatisMapperXmlInspection, MavenModelInspection -->
+            <!--suppress MybatisMapperXmlInspection, MavenModelInspection, MybatisXMapperXmlInspection -->
             <rulesUri>file://${maven.multiModuleProjectDirectory}/ruleset.xml</rulesUri>
           </configuration>
         </plugin>
-
+        <plugin>
+          <groupId>org.wildfly.plugins</groupId>
+          <artifactId>wildfly-maven-plugin</artifactId>
+          <version>${wildfly-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-ejb-plugin</artifactId>
+          <version>${maven-ejb-plugin.version}</version>
+          <configuration>
+            <ejbVersion>3.2</ejbVersion>
+            <!-- this is false by default -->
+            <generateClient>true</generateClient>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
 
     <plugins>
-
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
@@ -192,9 +281,14 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
       </plugin>
-
+      <plugin>
+        <groupId>org.wildfly.plugins</groupId>
+        <artifactId>wildfly-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-ejb-plugin</artifactId>
+      </plugin>
     </plugins>
-
 
   </build>
 </project>
